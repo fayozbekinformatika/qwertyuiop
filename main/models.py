@@ -30,6 +30,15 @@ class Course(models.Model):
             ('Yuqori', 'Yuqori')
         ]
     )
+    category = models.CharField(
+        max_length=50,
+        choices=[
+            ('backend', 'Backend'),
+            ('frontend', 'Frontend')
+        ],
+        default='backend'
+    )
+    youtube_link = models.URLField(blank=True, default='', help_text="YouTube video havolasi")
     lesson_count = models.IntegerField(default=0)
     progress = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)

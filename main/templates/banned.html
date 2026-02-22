@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirish taqiqlangan - MerenHub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #e74c3c;
+            margin-bottom: 15px;
+            font-size: 2rem;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .reason-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #e74c3c;
+        }
+        .reason-box h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .reason-box p {
+            margin-bottom: 0;
+            color: #555;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+        .contact {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+        .contact a {
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🚫</div>
+        <h1>Kirish Taqiqlangan</h1>
+        
+        <div class="reason-box">
+            <h3>Taqiqlanish sababi:</h3>
+            <p>{{ reason|default:"Sabab ko'rsatilmagan" }}</p>
+        </div>
+        
+        <p>Sizning hisobingiz vaqtincha to'xtatilgan. Boshqa hisob yaratmoqchi bo'lsangiz, adminga murojaat qiling.</p>
+        
+        <a href="mailto:yusubjonovfayozbek1@gmail.com" class="btn">Adminga yozish</a>
+        
+        <p class="contact">Yoki biz bilan bog'lanish uchun: <a href="mailto:yusubjonovfayozbek1@gmail.com">yusubjonovfayozbek1@gmail.com</a></p>
+    </div>
+</body>
+</html>

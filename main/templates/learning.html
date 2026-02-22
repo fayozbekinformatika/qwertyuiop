@@ -12,6 +12,8 @@
             --card: #ffffff;
             --text: #2d3436;
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --backend: #00b894;
+            --frontend: #0984e3;
         }
         .dark-theme {
             --bg: #1a1a2e;
@@ -19,19 +21,67 @@
             --text: #e9ecef;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background-color: var(--bg); color: var(--text); transition: var(--transition); }
+        body { background-color: var(--bg); color: var(--text); transition: var(--transition); min-height: 100vh; display: flex; flex-direction: column; }
+        .content-wrapper { flex: 1; }
 
         nav { background: var(--card); padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .logo-area { display: flex; align-items: center; gap: 12px; font-weight: 700; color: var(--primary); text-decoration: none; }
         
         .learning-header { padding: 50px 5%; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; text-align: center; border-radius: 0 0 50px 50px; }
         
-        .course-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; padding: 50px 5%; }
+        /* Category Selection */
+        .category-section { padding: 40px 5%; text-align: center; }
+        .category-grid { display: flex; gap: 30px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
+        .category-card { 
+            background: var(--card); 
+            padding: 40px 60px; 
+            border-radius: 25px; 
+            cursor: pointer; 
+            transition: var(--transition);
+            text-decoration: none;
+            color: var(--text);
+            min-width: 250px;
+        }
+        .category-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+        .category-card.backend { border: 3px solid var(--backend); }
+        .category-card.frontend { border: 3px solid var(--frontend); }
+        .category-card .icon { font-size: 4rem; margin-bottom: 15px; }
+        .category-card.backend .icon { color: var(--backend); }
+        .category-card.frontend .icon { color: var(--frontend); }
+        .category-card h2 { margin-bottom: 10px; }
+        .category-card p { opacity: 0.7; }
+
+        /* Course Grid */
+        .course-grid { display: none; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; padding: 50px 5%; }
+        .course-grid.active { display: grid; }
         
         .course-card { background: var(--card); border-radius: 25px; overflow: hidden; transition: var(--transition); border: 1px solid rgba(0,0,0,0.05); }
         .course-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
         
-        .course-img { height: 180px; background: #ddd; display: flex; align-items: center; justify-content: center; font-size: 3rem; background: linear-gradient(45deg, #f3f4f6, #e5e7eb); }
+        .course-img { 
+            height: 180px; 
+            background: #ddd; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 3rem; 
+            background: linear-gradient(45deg, #f3f4f6, #e5e7eb); 
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+        .course-img:hover { opacity: 0.9; }
+        .course-img .play-icon {
+            position: absolute;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         .dark-theme .course-img { background: linear-gradient(45deg, #1e293b, #334155); }
 
         .course-body { padding: 25px; }
@@ -46,13 +96,16 @@
         #theme-toggle { cursor: pointer; font-size: 1.2rem; background: none; border: none; color: white; padding: 8px; }
 
         /* Lessons section */
-        .lessons-section { padding: 30px 5%; }
-        .back-btn { display: inline-block; padding: 10px 20px; background: var(--primary); color: white; text-decoration: none; border-radius: 10px; margin-bottom: 20px; }
+        .lessons-section { display: none; padding: 30px 5%; }
+        .lessons-section.active { display: block; }
+        .back-btn { display: inline-block; padding: 10px 20px; background: var(--primary); color: white; text-decoration: none; border-radius: 10px; margin-bottom: 20px; cursor: pointer; border: none; font-size: 1rem; }
         .lesson-list { display: grid; gap: 15px; }
         .lesson-card { background: var(--card); padding: 20px; border-radius: 15px; transition: var(--transition); }
         .lesson-card:hover { transform: translateX(10px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .lesson-card a { text-decoration: none; color: var(--text); display: block; }
         .lesson-number { display: inline-block; width: 30px; height: 30px; background: var(--primary); color: white; border-radius: 50%; text-align: center; line-height: 30px; margin-right: 15px; }
+        
+        footer { background: var(--card); padding: 30px 5%; text-align: center; margin-top: auto; }
     </style>
 </head>
 <body class="{% if theme == 'dark' %}dark-theme{% endif %}">
@@ -82,42 +135,112 @@
         </div>
     </nav>
 
-    <div class="learning-header">
-        <h1>Bilim olishni boshlang!</h1>
-        <p>Sizning o'quv rejangiz va darajangiz bitta joyda.</p>
-    </div>
+    <div class="content-wrapper">
+        <div class="learning-header">
+            <h1>Bilim olishni boshlang!</h1>
+            <p>Yo'nalishni tanlang va o'rganishni boshlang</p>
+        </div>
 
-    <!-- Courses Section -->
-    <div class="course-grid" id="courses-section">
-        {% for course in courses %}
-        <div class="course-card">
-            <div class="course-img">{{ course.icon }}</div>
-            <div class="course-body">
-                <h3>{{ course.title }}</h3>
-                <p style="font-size: 0.9rem; opacity: 0.7;">{{ course.lesson_count }} ta dars • {{ course.level }}</p>
-                
-                <div class="progress-container">
-                    <div class="progress-bar" style="width: {{ course.progress }}%;"></div>
-                </div>
-                <p style="font-size: 0.8rem;">O'zlashtirish: {{ course.progress }}%</p>
-                
-                <div class="btn-group">
-                    <a href="#" class="btn-start" onclick="showLessons({{ course.id }}, '{{ course.slug }}')">Darslar</a>
-                    <a href="{% url 'quiz_list' %}" class="btn-quiz">Quiz 🎯</a>
-                </div>
+        <!-- Category Selection -->
+        <div class="category-section" id="category-section">
+            <h2>Yo'nalishni tanlang</h2>
+            <div class="category-grid">
+                <a href="#" class="category-card backend" onclick="showCourses('backend')">
+                    <div class="icon">⚙️</div>
+                    <h2>Backend</h2>
+                    <p>Python, Django, Server</p>
+                </a>
+                <a href="#" class="category-card frontend" onclick="showCourses('frontend')">
+                    <div class="icon">🎨</div>
+                    <h2>Frontend</h2>
+                    <p>HTML, CSS, JavaScript</p>
+                </a>
             </div>
         </div>
-        {% empty %}
-        <p>Hozircha kurslar qo'shilmagan.</p>
-        {% endfor %}
+
+        <!-- Backend Courses -->
+        <div class="course-grid" id="backend-courses">
+            <a href="#" class="back-btn" onclick="showCategories()">← Orqaga</a>
+            <h2 style="grid-column: 1/-1; margin-bottom: 20px;">⚙️ Backend Kurslari</h2>
+            {% for course in courses %}
+            {% if course.category == 'backend' %}
+            <div class="course-card">
+                {% if course.youtube_link %}
+                <div class="course-img" onclick="window.open('{{ course.youtube_link }}', '_blank')">
+                    {{ course.icon }}
+                    <div class="play-icon">▶ YouTube</div>
+                </div>
+                {% else %}
+                <div class="course-img">{{ course.icon }}</div>
+                {% endif %}
+                <div class="course-body">
+                    <h3>{{ course.title }}</h3>
+                    <p style="font-size: 0.9rem; opacity: 0.7;">{{ course.lesson_count }} ta dars • {{ course.level }}</p>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: {{ course.progress }}%;"></div>
+                    </div>
+                    <p style="font-size: 0.8rem;">O'zlashtirish: {{ course.progress }}%</p>
+                    
+                    <div class="btn-group">
+                        <a href="#" class="btn-start" onclick="showLessons({{ course.id }}, '{{ course.slug }}')">Darslar</a>
+                        <a href="{% url 'quiz_list' %}" class="btn-quiz">Quiz 🎯</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% empty %}
+            <p style="grid-column: 1/-1;">Hozircha Backend kurslari yo'q.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Frontend Courses -->
+        <div class="course-grid" id="frontend-courses">
+            <a href="#" class="back-btn" onclick="showCategories()">← Orqaga</a>
+            <h2 style="grid-column: 1/-1; margin-bottom: 20px;">🎨 Frontend Kurslari</h2>
+            {% for course in courses %}
+            {% if course.category == 'frontend' %}
+            <div class="course-card">
+                {% if course.youtube_link %}
+                <div class="course-img" onclick="window.open('{{ course.youtube_link }}', '_blank')">
+                    {{ course.icon }}
+                    <div class="play-icon">▶ YouTube</div>
+                </div>
+                {% else %}
+                <div class="course-img">{{ course.icon }}</div>
+                {% endif %}
+                <div class="course-body">
+                    <h3>{{ course.title }}</h3>
+                    <p style="font-size: 0.9rem; opacity: 0.7;">{{ course.lesson_count }} ta dars • {{ course.level }}</p>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: {{ course.progress }}%;"></div>
+                    </div>
+                    <p style="font-size: 0.8rem;">O'zlashtirish: {{ course.progress }}%</p>
+                    
+                    <div class="btn-group">
+                        <a href="#" class="btn-start" onclick="showLessons({{ course.id }}, '{{ course.slug }}')">Darslar</a>
+                        <a href="{% url 'quiz_list' %}" class="btn-quiz">Quiz 🎯</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% empty %}
+            <p style="grid-column: 1/-1;">Hozircha Frontend kurslari yo'q.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Lessons will be loaded dynamically -->
+        <div class="lessons-section" id="lessons-section">
+            <button class="back-btn" onclick="showCategories()">← Orqaga</button>
+            <h2 id="course-title"></h2>
+            <div class="lesson-list" id="lesson-list"></div>
+        </div>
     </div>
 
-    <!-- Lessons will be loaded dynamically -->
-    <div class="lessons-section" id="lessons-section" style="display: none;">
-        <a href="#" class="back-btn" onclick="showCourses()">← Orqaga</a>
-        <h2 id="course-title"></h2>
-        <div class="lesson-list" id="lesson-list"></div>
-    </div>
+    <footer>
+        <p>&copy; 2026 MerenHub — Barcha huquqlar himoyalangan</p>
+    </footer>
 
     <script>
         const coursesData = {};
@@ -125,6 +248,7 @@
         coursesData[{{ course.id }}] = {
             slug: '{{ course.slug }}',
             title: '{{ course.title }}',
+            youtube_link: '{{ course.youtube_link|default:"" }}',
             lessons: [
                 {% for lesson in course.lessons.all %}
                 {
@@ -138,19 +262,41 @@
         };
         {% endfor %}
 
+        function showCategories() {
+            document.getElementById('category-section').style.display = 'block';
+            document.getElementById('backend-courses').classList.remove('active');
+            document.getElementById('frontend-courses').classList.remove('active');
+            document.getElementById('lessons-section').classList.remove('active');
+        }
+
+        function showCourses(category) {
+            document.getElementById('category-section').style.display = 'none';
+            if (category === 'backend') {
+                document.getElementById('backend-courses').classList.add('active');
+                document.getElementById('frontend-courses').classList.remove('active');
+            } else {
+                document.getElementById('frontend-courses').classList.add('active');
+                document.getElementById('backend-courses').classList.remove('active');
+            }
+            document.getElementById('lessons-section').classList.remove('active');
+        }
+
         function showLessons(courseId, courseSlug) {
             const course = coursesData[courseId];
             if (!course) return;
 
-            document.getElementById('courses-section').style.display = 'none';
-            document.getElementById('lessons-section').style.display = 'block';
+            document.getElementById('category-section').style.display = 'none';
+            document.getElementById('backend-courses').classList.remove('active');
+            document.getElementById('frontend-courses').classList.remove('active');
+            document.getElementById('lessons-section').classList.add('active');
+            
             document.getElementById('course-title').textContent = course.title;
 
             const lessonList = document.getElementById('lesson-list');
             lessonList.innerHTML = '';
 
             if (course.lessons.length === 0) {
-                lessonList.innerHTML = '<p>Hozircha darslar qo\'shilmagan.</p>';
+                lessonList.innerHTML = '<p>Hozircha darslar qoshilmagan.</p>';
                 return;
             }
 
@@ -168,10 +314,8 @@
             });
         }
 
-        function showCourses() {
-            document.getElementById('lessons-section').style.display = 'none';
-            document.getElementById('courses-section').style.display = 'grid';
-        }
+        // Show categories by default
+        showCategories();
     </script>
 </body>
 </html>
