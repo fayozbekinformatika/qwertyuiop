@@ -1,2 +1,1 @@
-release: python manage.py migrate
-web: gunicorn merenhub_project.wsgi --log-file -
+web: sh -c "python manage.py migrate && gunicorn merenhub_project.wsgi --log-file -"
