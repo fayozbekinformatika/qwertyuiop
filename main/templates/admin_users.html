@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - MerenHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen">
+    <div class="container mx-auto px-4 py-12">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <a href="{% url 'index' %}" class="text-purple-400 hover:text-white mb-2 inline-block">← Asosiy sahifaga qaytish</a>
+                <h1 class="text-3xl font-bold text-white">👑 Admin Panel</h1>
+                <p class="text-gray-400">Foydalanuvchilarni boshqarish</p>
+            </div>
+            <button onclick="loadUsers()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                🔄 Yangilash
+            </button>
+        </div>
+
+        <div class="bg-slate-800/50 rounded-2xl p-6 border border-slate-700">
+            <h2 class="text-xl font-bold text-white mb-4">Barcha Foydalanuvchilar</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b border-slate-700">
+                            <th class="pb-3 text-gray-400">ID</th>
+                            <th class="pb-3 text-gray-400">Username</th>
+                            <th class="pb-3 text-gray-400">Email</th>
+                            <th class="pb-3 text-gray-400">Status</th>
+                            <th class="pb-3 text-gray-400">Qo'shilgan</th>
+                            <th class="pb-3 text-gray-400">Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTable">
+                        <tr>
+                            <td colspan="6" class="py-8 text-center text-gray-400">Yuklanmoqda...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUsers();
+        });
+
+        async function loadUsers() {
+            try {
+                var response = await fetch('/api/users/');
+                var data = await response.json();
+                
+                if (data.success) {
+                    renderUsers(data.users);
+                } else {
+                    alert('Xatolik: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('usersTable').innerHTML = '<tr><td colspan="6" class="py-8 text-center text-red-400">Xatolik yuz berdi</td></tr>';
+            }
+        }
+
+        function renderUsers(users) {
+            var tbody = document.getElementById('usersTable');
+            
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-gray-400">Foydalanuvchilar yoq</td></tr>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < users.length; i++) {
+                var user = users[i];
+                var statusHtml = '';
+                if (user.is_vip) {
+                    statusHtml = '<span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-sm">VIP</span>';
+                } else if (user.is_pro) {
+                    statusHtml = '<span class="bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full text-sm">PRO</span>';
+                } else {
+                    statusHtml = '<span class="bg-gray-500/20 text-gray-400 px-3 py-1 rounded-full text-sm">Oddiy</span>';
+                }
+                if (user.is_banned) {
+                    statusHtml += '<span class="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-sm ml-2">Ban</span>';
+                }
+
+                var actionHtml = '';
+                if (user.is_vip) {
+                    actionHtml = '<button onclick="removeVip(' + user.id + ')" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded text-sm">VIPni olib tashlash</button>';
+                } else if (user.is_pro) {
+                    actionHtml = '<button onclick="makeVip(' + user.id + ')" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded text-sm">VIP qilish</button>';
+                    actionHtml += ' <button onclick="removeVip(' + user.id + ')" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded text-sm">PROni olib tashlash</button>';
+                } else {
+                    actionHtml = '<button onclick="makeVip(' + user.id + ')" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded text-sm">VIP qilish</button>';
+                    actionHtml += ' <button onclick="makePro(' + user.id + ')" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm">PRO qilish</button>';
+                }
+                if (!user.is_banned) {
+                    actionHtml += ' <button onclick="banUser(' + user.id + ')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">Ban</button>';
+                } else {
+                    actionHtml += ' <button onclick="unbanUser(' + user.id + ')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">Unban</button>';
+                }
+
+                html += '<tr class="border-b border-slate-700/50 hover:bg-slate-700/30">';
+                html += '<td class="py-3 text-gray-300">' + user.id + '</td>';
+                html += '<td class="py-3 text-white font-medium">' + user.username + '</td>';
+                html += '<td class="py-3 text-gray-300">' + (user.email || '-') + '</td>';
+                html += '<td class="py-3">' + statusHtml + '</td>';
+                html += '<td class="py-3 text-gray-400">' + user.date_joined + '</td>';
+                html += '<td class="py-3"><div class="flex gap-2">' + actionHtml + '</div></td>';
+                html += '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        async function makeVip(userId) {
+            if (!confirm('Foydalanuvchini VIP qilishni tasdiqlaysizmi?')) return;
+            
+            try {
+                var response = await fetch('/api/make-vip/' + userId + '/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCookie('csrftoken') }
+                });
+                var data = await response.json();
+                
+                if (data.success) {
+                    alert(data.message + ' Foydalanuvchi logout qilindi.');
+                    loadUsers();
+                } else {
+                    alert('Xatolik: ' + data.error);
+                }
+            } catch (error) {
+                alert('Xatolik yuz berdi');
+            }
+        }
+
+        async function makePro(userId) {
+            if (!confirm('Foydalanuvchini PRO qilishni tasdiqlaysizmi? (30 kun)')) return;
+            
+            try {
+                var response = await fetch('/api/make-pro/' + userId + '/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCookie('csrftoken') }
+                });
+                var data = await response.json();
+                
+                if (data.success) {
+                    alert(data.message + ' Foydalanuvchi logout qilindi.');
+                    loadUsers();
+                } else {
+                    alert('Xatolik: ' + data.error);
+                }
+            } catch (error) {
+                alert('Xatolik yuz berdi');
+            }
+        }
+
+        async function removeVip(userId) {
+            if (!confirm('VIP/PROni olib tashlashni tasdiqlaysizmi?')) return;
+            
+            try {
+                var response = await fetch('/api/remove-vip/' + userId + '/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCookie('csrftoken') }
+                });
+                var data = await response.json();
+                
+                if (data.success) {
+                    alert(data.message);
+                    loadUsers();
+                } else {
+                    alert('Xatolik: ' + data.error);
+                }
+            } catch (error) {
+                alert('Xatolik yuz berdi');
+            }
+        }
+
+        async function banUser(userId) {
+            var reason = prompt('Ban sababini kiriting:');
+            if (!reason) return;
+            
+            try {
+                var response = await fetch('/api/ban-user/' + userId + '/', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken') 
+                    },
+                    body: JSON.stringify({ reason: reason })
+                });
+                var data = await response.json();
+                
+                if (data.success) {
+                    alert(data.message);
+                    loadUsers();
+                } else {
+                    alert('Xatolik: ' + data.error);
+                }
+            } catch (error) {
+                alert('Xatolik yuz berdi');
+            }
+        }
+
+        async function unbanUser(userId) {
+            if (!confirm('Foydalanuvchini ban dan chiqarishni tasdiqlaysizmi?')) return;
+            
+            try {
+                var response = await fetch('/api/unban-user/' + userId + '/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCookie('csrftoken') }
+                });
+                var data = await response.json();
+                
+                if (data.success) {
+                    alert(data.message);
+                    loadUsers();
+                } else {
+                    alert('Xatolik: ' + data.error);
+                }
+            } catch (error) {
+                alert('Xatolik yuz berdi');
+            }
+        }
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

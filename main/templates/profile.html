@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - MerenHub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #2d3436;
+        }
+        .dark-theme {
+            --bg: #1a1a2e;
+            --card: #16213e;
+            --text: #e9ecef;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; }
+        .container { max-width: 800px; margin: 50px auto; padding: 20px; }
+        .profile-card {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        h1 { color: var(--primary); margin-bottom: 30px; text-align: center; }
+        .profile-info { margin-bottom: 30px; }
+        .profile-info p { margin: 15px 0; font-size: 1.1rem; }
+        .profile-info strong { color: var(--primary); }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            margin: 5px;
+            transition: 0.3s;
+        }
+        .btn:hover { background: #5b4cdb; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #5a6268; }
+        .back-link { text-align: center; margin-top: 20px; }
+        .back-link a { color: var(--primary); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="profile-card">
+            <h1>Profil</h1>
+            <div class="profile-info">
+                <p><strong>Username:</strong> {{ user.username }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Ism:</strong> {{ user.first_name }}</p>
+                <p><strong>Familiya:</strong> {{ user.last_name }}</p>
+            </div>
+            <div style="text-align: center;">
+                <a href="{% url 'password_change' %}" class="btn">Parolni o'zgartirish</a>
+                <a href="{% url 'index' %}" class="btn btn-secondary">Bosh sahifaga qaytish</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

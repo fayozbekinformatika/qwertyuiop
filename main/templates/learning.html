@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning - MerenHub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #2d3436;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .dark-theme {
+            --bg: #1a1a2e;
+            --card: #16213e;
+            --text: #e9ecef;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); transition: var(--transition); }
+
+        nav { background: var(--card); padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .logo-area { display: flex; align-items: center; gap: 12px; font-weight: 700; color: var(--primary); text-decoration: none; }
+        
+        .learning-header { padding: 50px 5%; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; text-align: center; border-radius: 0 0 50px 50px; }
+        
+        .course-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; padding: 50px 5%; }
+        
+        .course-card { background: var(--card); border-radius: 25px; overflow: hidden; transition: var(--transition); border: 1px solid rgba(0,0,0,0.05); }
+        .course-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        
+        .course-img { height: 180px; background: #ddd; display: flex; align-items: center; justify-content: center; font-size: 3rem; background: linear-gradient(45deg, #f3f4f6, #e5e7eb); }
+        .dark-theme .course-img { background: linear-gradient(45deg, #1e293b, #334155); }
+
+        .course-body { padding: 25px; }
+        .progress-container { background: #eee; height: 8px; border-radius: 10px; margin: 15px 0; overflow: hidden; }
+        .progress-bar { background: var(--primary); height: 100%; border-radius: 10px; transition: 1s ease-in-out; }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-start { flex: 1; padding: 12px; background: var(--primary); color: white; text-align: center; text-decoration: none; border-radius: 12px; font-weight: 600; }
+        .btn-quiz { flex: 1; padding: 12px; background: #f59e0b; color: white; text-align: center; text-decoration: none; border-radius: 12px; font-weight: 600; }
+        .btn-quiz:hover { background: #d97706; }
+        
+        #theme-toggle { cursor: pointer; font-size: 1.2rem; background: none; border: none; color: white; padding: 8px; }
+
+        /* Lessons section */
+        .lessons-section { padding: 30px 5%; }
+        .back-btn { display: inline-block; padding: 10px 20px; background: var(--primary); color: white; text-decoration: none; border-radius: 10px; margin-bottom: 20px; }
+        .lesson-list { display: grid; gap: 15px; }
+        .lesson-card { background: var(--card); padding: 20px; border-radius: 15px; transition: var(--transition); }
+        .lesson-card:hover { transform: translateX(10px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .lesson-card a { text-decoration: none; color: var(--text); display: block; }
+        .lesson-number { display: inline-block; width: 30px; height: 30px; background: var(--primary); color: white; border-radius: 50%; text-align: center; line-height: 30px; margin-right: 15px; }
+    </style>
+</head>
+<body class="{% if theme == 'dark' %}dark-theme{% endif %}">
+    <nav>
+        <a href="{% url 'index' %}" class="logo-area">
+            <div style="background: var(--primary); color: white; padding: 5px 12px; border-radius: 8px;">M</div>
+            <span>Learning Center</span>
+            {% if is_pro %}<span style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; margin-left: 5px;">PRO</span>{% endif %}
+        </a>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            {% if user.is_staff %}
+            <a href="{% url 'admin_users' %}" style="color: #ffd700; text-decoration: none;">⚙️ Admin</a>
+            {% endif %}
+            {% if user.is_authenticated and not is_pro %}
+            <a href="{% url 'pro_upgrade' %}" style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; padding: 8px 20px; border-radius: 10px; text-decoration: none;">💎 PRO</a>
+            {% endif %}
+            <form method="POST" action="{% url 'toggle_theme' %}" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="theme" value="{% if theme == 'dark' %}light{% else %}dark{% endif %}">
+                <button type="submit" id="theme-toggle">{% if theme == 'dark' %}🌙{% else %}☀️{% endif %}</button>
+            </form>
+            {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" style="text-decoration: none; color: var(--text);">Chiqish</a>
+            {% else %}
+            <a href="{% url 'login' %}" style="text-decoration: none; color: var(--text);">Kirish</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="learning-header">
+        <h1>Bilim olishni boshlang!</h1>
+        <p>Sizning o'quv rejangiz va darajangiz bitta joyda.</p>
+    </div>
+
+    <!-- Courses Section -->
+    <div class="course-grid" id="courses-section">
+        {% for course in courses %}
+        <div class="course-card">
+            <div class="course-img">{{ course.icon }}</div>
+            <div class="course-body">
+                <h3>{{ course.title }}</h3>
+                <p style="font-size: 0.9rem; opacity: 0.7;">{{ course.lesson_count }} ta dars • {{ course.level }}</p>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: {{ course.progress }}%;"></div>
+                </div>
+                <p style="font-size: 0.8rem;">O'zlashtirish: {{ course.progress }}%</p>
+                
+                <div class="btn-group">
+                    <a href="#" class="btn-start" onclick="showLessons({{ course.id }}, '{{ course.slug }}')">Darslar</a>
+                    <a href="{% url 'quiz_list' %}" class="btn-quiz">Quiz 🎯</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>Hozircha kurslar qo'shilmagan.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Lessons will be loaded dynamically -->
+    <div class="lessons-section" id="lessons-section" style="display: none;">
+        <a href="#" class="back-btn" onclick="showCourses()">← Orqaga</a>
+        <h2 id="course-title"></h2>
+        <div class="lesson-list" id="lesson-list"></div>
+    </div>
+
+    <script>
+        const coursesData = {};
+        {% for course in courses %}
+        coursesData[{{ course.id }}] = {
+            slug: '{{ course.slug }}',
+            title: '{{ course.title }}',
+            lessons: [
+                {% for lesson in course.lessons.all %}
+                {
+                    id: {{ lesson.id }},
+                    title: '{{ lesson.title }}',
+                    slug: '{{ lesson.slug }}',
+                    order: {{ lesson.order }}
+                },
+                {% endfor %}
+            ]
+        };
+        {% endfor %}
+
+        function showLessons(courseId, courseSlug) {
+            const course = coursesData[courseId];
+            if (!course) return;
+
+            document.getElementById('courses-section').style.display = 'none';
+            document.getElementById('lessons-section').style.display = 'block';
+            document.getElementById('course-title').textContent = course.title;
+
+            const lessonList = document.getElementById('lesson-list');
+            lessonList.innerHTML = '';
+
+            if (course.lessons.length === 0) {
+                lessonList.innerHTML = '<p>Hozircha darslar qo\'shilmagan.</p>';
+                return;
+            }
+
+            course.lessons.sort((a, b) => a.order - b.order);
+            course.lessons.forEach(lesson => {
+                const lessonCard = document.createElement('div');
+                lessonCard.className = 'lesson-card';
+                lessonCard.innerHTML = `
+                    <a href="/learning/${course.slug}/${lesson.slug}/">
+                        <span class="lesson-number">${lesson.order}</span>
+                        ${lesson.title}
+                    </a>
+                `;
+                lessonList.appendChild(lessonCard);
+            });
+        }
+
+        function showCourses() {
+            document.getElementById('lessons-section').style.display = 'none';
+            document.getElementById('courses-section').style.display = 'grid';
+        }
+    </script>
+</body>
+</html>

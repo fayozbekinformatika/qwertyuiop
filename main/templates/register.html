@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ro'yxatdan o'tish - MerenHub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #2d3436;
+        }
+        .dark-theme {
+            --bg: #1a1a2e;
+            --card: #16213e;
+            --text: #e9ecef;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { 
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%); 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .register-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        .dark-theme .register-container {
+            background: var(--card);
+            color: var(--text);
+        }
+        h1 { text-align: center; color: var(--primary); margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text); }
+        input { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 2px solid #eee; 
+            border-radius: 10px; 
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+            background: var(--card);
+            color: var(--text);
+        }
+        input:focus { border-color: var(--primary); }
+        .btn-register {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-register:hover { background: #5b4cdb; }
+        .links { text-align: center; margin-top: 20px; }
+        .links a { color: var(--primary); text-decoration: none; }
+        .error { color: red; font-size: 0.9rem; text-align: center; margin-bottom: 15px; }
+        .helptext { font-size: 0.8rem; color: #666; margin-top: 5px; }
+        .dark-theme .helptext { color: #aaa; }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h1>Ro'yxatdan o'tish</h1>
+        
+        {% if form.errors %}
+            <p class="error">Xatolik yuz berdi. Iltimos, qayta urinib ko'ring!</p>
+        {% endif %}
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">Username</label>
+                <input type="text" name="username" id="id_username" placeholder="Username" required>
+                {% if form.username.help_text %}
+                    <p class="helptext">{{ form.username.help_text }}</p>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_email">Email</label>
+                <input type="email" name="email" id="id_email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <label for="id_password1">Parol</label>
+                <input type="password" name="password1" id="id_password1" placeholder="Parol" required>
+                {% if form.password1.help_text %}
+                    <p class="helptext">{{ form.password1.help_text }}</p>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_password2">Parolni tasdiqlang</label>
+                <input type="password" name="password2" id="id_password2" placeholder="Parolni qayta kiriting" required>
+                {% if form.password2.help_text %}
+                    <p class="helptext">{{ form.password2.help_text }}</p>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn-register">Ro'yxatdan o'tish</button>
+        </form>
+        
+        <div class="links">
+            <p>Allaqachon hisobingiz bormi? <a href="{% url 'login' %}">Kirish</a></p>
+            <br>
+            <a href="{% url 'index' %}">Bosh sahifaga qaytish</a>
+        </div>
+    </div>
+</body>
+</html>

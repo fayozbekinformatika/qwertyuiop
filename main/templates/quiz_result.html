@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Natija - MerenHub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #2d3436;
+        }
+        .dark-theme {
+            --bg: #1a1a2e;
+            --card: #16213e;
+            --text: #e9ecef;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: var(--bg); color: var(--text); }
+        
+        nav { background: var(--card); padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .logo-area { display: flex; align-items: center; gap: 12px; font-weight: 700; color: var(--primary); text-decoration: none; }
+        
+        .container { max-width: 600px; margin: 50px auto; padding: 0 5%; text-align: center; }
+        
+        .result-card { background: var(--card); padding: 40px; border-radius: 25px; }
+        h1 { margin-bottom: 20px; color: var(--primary); }
+        
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .score-text { font-size: 1.3rem; margin-bottom: 30px; }
+        
+        .btn-retry {
+            display: inline-block;
+            padding: 15px 30px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            margin: 5px;
+        }
+        
+        .btn-home {
+            display: inline-block;
+            padding: 15px 30px;
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body class="{% if theme == 'dark' %}dark-theme{% endif %}">
+    <nav>
+        <a href="{% url 'index' %}" class="logo-area">
+            <div style="background: var(--primary); color: white; padding: 5px 12px; border-radius: 8px;">M</div>
+            <span>MerenHub</span>
+        </a>
+    </nav>
+
+    <div class="container">
+        <div class="result-card">
+            <h1>{{ quiz.title }}</h1>
+            <div class="score-circle">{{ percentage }}%</div>
+            <p class="score-text">Siz {{ score }}ta savolga to'g'ri javob berdingiz {{ total }}ta savoldan!</p>
+            
+            <a href="{% url 'take_quiz' quiz.id %}" class="btn-retry">Qayta urinish</a>
+            <a href="{% url 'index' %}" class="btn-home">Bosh sahifa</a>
+        </div>
+    </div>
+</body>
+</html>

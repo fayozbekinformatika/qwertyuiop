@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ lesson.title }} - MerenHub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #2d3436;
+        }
+        .dark-theme {
+            --bg: #1a1a2e;
+            --card: #16213e;
+            --text: #e9ecef;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: var(--bg); color: var(--text); }
+        
+        nav { background: var(--card); padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .logo-area { display: flex; align-items: center; gap: 12px; font-weight: 700; color: var(--primary); text-decoration: none; }
+        
+        .container { display: flex; min-height: 100vh; }
+        .sidebar { width: 300px; background: var(--card); padding: 20px; border-right: 1px solid #eee; }
+        .sidebar h3 { margin-bottom: 20px; color: var(--primary); }
+        
+        .lesson-item { padding: 12px 15px; margin-bottom: 10px; border-radius: 10px; transition: 0.3s; }
+        .lesson-item:hover { background: rgba(108, 92, 231, 0.1); }
+        .lesson-item.active { background: var(--primary); color: white; }
+        .lesson-item a { text-decoration: none; color: inherit; display: block; }
+        
+        .content { flex: 1; padding: 40px; max-width: 900px; }
+        .content h1 { margin-bottom: 20px; color: var(--primary); }
+        .content p { line-height: 1.8; font-size: 1.1rem; margin-bottom: 20px; }
+        .content code { background: #f1f1f1; padding: 2px 8px; border-radius: 5px; font-family: monospace; }
+        
+        .nav-buttons { display: flex; gap: 15px; margin-top: 30px; }
+        .nav-btn { padding: 12px 25px; background: var(--primary); color: white; text-decoration: none; border-radius: 10px; }
+        
+        #theme-toggle { cursor: pointer; font-size: 1.2rem; background: none; border: none; color: var(--text); padding: 8px; }
+    </style>
+</head>
+<body class="{% if theme == 'dark' %}dark-theme{% endif %}">
+    <nav>
+        <a href="{% url 'index' %}" class="logo-area">
+            <div style="background: var(--primary); color: white; padding: 5px 12px; border-radius: 8px;">M</div>
+            <span>Learning Center</span>
+        </a>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <form method="POST" action="{% url 'toggle_theme' %}" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="theme" value="{% if theme == 'dark' %}light{% else %}dark{% endif %}">
+                <button type="submit" id="theme-toggle">{% if theme == 'dark' %}🌙{% else %}☀️{% endif %}</button>
+            </form>
+            <a href="{% url 'learning' %}" style="text-decoration: none; color: var(--text);">Kurslar</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" style="text-decoration: none; color: var(--text);">Chiqish</a>
+            {% else %}
+            <a href="{% url 'login' %}" style="text-decoration: none; color: var(--text);">Kirish</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="sidebar">
+            <h3>{{ course.title }}</h3>
+            {% for l in lessons %}
+            <div class="lesson-item {% if l.id == lesson.id %}active{% endif %}">
+                <a href="{% url 'lesson_detail' course.slug l.slug %}">
+                    {{ forloop.counter }}. {{ l.title }}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="content">
+            <h1>{{ lesson.title }}</h1>
+            <div class="lesson-content">
+                {{ lesson.content|linebreaks }}
+            </div>
+            
+            <div class="nav-buttons">
+                {% if previous_lesson %}
+                <a href="{% url 'lesson_detail' course.slug previous_lesson.slug %}" class="nav-btn">← Oldingi dars</a>
+                {% endif %}
+                {% if next_lesson %}
+                <a href="{% url 'lesson_detail' course.slug next_lesson.slug %}" class="nav-btn">Keyingi dars →</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

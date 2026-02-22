@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mening Mega Portalim</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #2d3436;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .dark-theme {
+            --bg: #1a1a2e;
+            --card: #16213e;
+            --text: #e9ecef;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); transition: var(--transition); }
+        nav { background: var(--card); padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .logo-area { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.2rem; color: var(--primary); cursor: pointer; }
+        .nav-links { display: flex; gap: 25px; align-items: center; }
+        .nav-links a { text-decoration: none; color: var(--text); font-weight: 500; position: relative; }
+        .nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0%; height: 2px; background: var(--primary); transition: var(--transition); }
+        .nav-links a:hover::after { width: 100%; }
+        .login-btn { background: var(--primary); color: white !important; padding: 8px 22px; border-radius: 10px; }
+        .pro-btn { 
+            background: linear-gradient(135deg, #f093fb, #f5576c); 
+            color: white !important; 
+            padding: 8px 20px; 
+            border-radius: 10px; 
+            font-weight: 600;
+            animation: proGlow 2s ease-in-out infinite;
+        }
+        @keyframes proGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(240, 147, 251, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(240, 147, 251, 0.6); }
+        }
+        .pro-badge {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+        #theme-toggle { cursor: pointer; font-size: 1.2rem; background: none; border: none; color: var(--text); padding: 8px; }
+        .header-content { padding: 60px 5%; text-align: center; }
+        .search-box { margin-top: 30px; max-width: 500px; margin-left: auto; margin-right: auto; position: relative; }
+        .search-box input { width: 100%; padding: 15px 25px; border-radius: 30px; border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.05); outline: none; }
+        .stats-bar { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; }
+        .stat-item { text-align: center; }
+        .stat-item h2 { color: var(--primary); }
+        .main-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; padding: 0 5% 60px; }
+        .card { background: var(--card); padding: 30px; border-radius: 25px; transition: var(--transition); cursor: pointer; }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .card h3 { color: var(--primary); margin-bottom: 15px; }
+        .badge { display: inline-block; padding: 5px 15px; background: var(--primary); color: white; border-radius: 20px; font-size: 0.8rem; margin-bottom: 15px; }
+        footer { background: var(--card); padding: 30px 5%; text-align: center; margin-top: auto; }
+        
+        /* PRO Banner */
+        .pro-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .pro-banner:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        .pro-banner-text {
+            font-weight: 600;
+        }
+        .pro-banner-btn {
+            background: white;
+            color: #667eea;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        /* Projects Section */
+        .projects-section { padding: 0 5% 60px; }
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .project-card { background: var(--card); padding: 20px; border-radius: 15px; transition: var(--transition); cursor: pointer; text-decoration: none; color: var(--text); display: block; }
+        .project-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .project-card h4 { color: var(--primary); margin-bottom: 10px; }
+        .project-card p { font-size: 0.9rem; opacity: 0.8; }
+    </style>
+</head>
+<body class="{% if theme == 'dark' %}dark-theme{% endif %}">
+    <!-- PRO Banner - show only for non-PRO users -->
+    {% if user.is_authenticated and not is_pro %}
+    <div class="pro-banner" onclick="location.href='{% url 'pro_upgrade' %}'">
+        <span class="pro-banner-text">💎 PRO versiya - Barcha imkoniyatlar ochiladi!</span>
+        <span class="pro-banner-btn">Sotib olish →</span>
+    </div>
+    {% endif %}
+
+    <nav>
+        <div class="logo-area" onclick="location.href='{% url 'index' %}'">
+            <div style="background: var(--primary); color: white; padding: 8px 15px; border-radius: 10px;">M</div>
+            <span>MerenHub</span>
+            {% if is_pro %}<span class="pro-badge">PRO</span>{% endif %}
+        </div>
+        <div class="nav-links">
+            {% if user.is_staff %}
+            <a href="{% url 'admin_users' %}" style="color: #ffd700;">⚙️ Admin</a>
+            {% endif %}
+            <a href="{% url 'test_bot' %}">Test Bot</a>
+            <a href="{% url 'learning' %}">Learning</a>
+            <a href="{% url 'quiz_list' %}">Quiz 🎯</a>
+            <a href="{% url 'blog' %}">Blog</a>
+            {% if user.is_authenticated and not is_pro %}
+            <a href="{% url 'pro_upgrade' %}" class="pro-btn">💎 PRO</a>
+            {% endif %}
+            <form method="POST" action="{% url 'toggle_theme' %}" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="theme" value="{% if theme == 'dark' %}light{% else %}dark{% endif %}">
+                <button type="submit" id="theme-toggle">{% if theme == 'dark' %}🌙{% else %}☀️{% endif %}</button>
+            </form>
+            {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="login-btn">Chiqish</a>
+            {% else %}
+            <a href="{% url 'login' %}" class="login-btn">Log In</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="header-content">
+        <h1>Xush kelibsiz, Dasturchi!</h1>
+        <p>Barcha loyihalar va o'quv materiallari bitta joyda.</p>
+        
+        <div class="search-box">
+            <input type="text" placeholder="Loyiha qidirish...">
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <h2>{{ project_count|default:"0" }}</h2>
+            <p>Loyihalar</p>
+        </div>
+        <div class="stat-item">
+            <h2>90%</h2>
+            <p>O'zlashtirish</p>
+        </div>
+        <div class="stat-item">
+            <h2 id="clock">00:00</h2>
+            <p>Hozirgi vaqt</p>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <div class="card" onclick="location.href='{% url 'test_bot' %}'">
+            <span class="badge">Yangi</span>
+            <h3>Telegram Test Bot</h3>
+            <p>siz telegram kodingizni ishlashini tokensiz korishingiz mumkin.</p>
+        </div>
+
+        <div class="card" onclick="location.href='{% url 'learning' %}'">
+            <span class="badge">Kurs</span>
+            <h3>Telegram bot Learning</h3>
+            <p>siz pythonda telegram bot uchun kodni yozishni organishingiz mumkin.</p>
+        </div>
+
+        <div class="card" onclick="location.href='{% url 'quiz_list' %}'">
+            <span class="badge">Quiz 🎯</span>
+            <h3>Quiz</h3>
+            <p>bilimlaringizni sinab koring.</p>
+        </div>
+
+        <div class="card" onclick="location.href='{% url 'blog' %}'">
+            <span class="badge">Arxiv</span>
+            <h3>Blog</h3>
+            <p>yangi malumotlarni faqat shu yerdan olishingiz mumkin.</p>
+        </div>
+    </div>
+
+    <!-- Projects Section -->
+    <div class="projects-section">
+        <h2 style="text-align: center; margin-bottom: 30px; color: var(--primary);">Loyihalarim</h2>
+        <div class="projects-grid">
+            {% for project in projects %}
+            <a href="{{ project.link }}" class="project-card" {% if project.link == '#' %}onclick="return false;"{% endif %}>
+                <h4>{{ project.title }}</h4>
+                <p>{{ project.description }}</p>
+            </a>
+            {% empty %}
+            <p style="text-align: center; grid-column: 1/-1;">Hozircha loyihalar yo'q. Admin panel orqali loyiha qo'shing.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 DevHub — Shaxsiy Ish Maydoni</p>
+    </footer>
+
+    <script>
+        function updateClock() {
+            var now = new Date();
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var time = hours.toString().padStart(2, '0') + ":" + minutes.toString().padStart(2, '0');
+            document.getElementById('clock').textContent = time;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+</html>
